@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101820">
+  <title>Agent Protocol - Secret Mission</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-icon">◆</span>
+        <div>
+          <strong>AGENT PROTOCOL</strong>
+          <small>CLASSIFIED OPERATIONS</small>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="pause-btn" class="top-home-btn" type="button" disabled>Ⅱ PAUSE</button>
+        <button id="home-btn" class="top-home-btn" type="button">⌂ HOME</button>
+        <div class="connection"><span class="online-dot"></span>SYSTEM ONLINE</div>
+      </div>
+    </header>
+
+    <section class="hud" aria-label="Status permainan">
+      <div class="hud-item">
+        <span class="hud-label">MISI</span>
+        <strong id="hud-level">01 / 03</strong>
+        <small id="hud-level-name">TRAINING ROOM</small>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">WAKTU</span>
+        <strong id="hud-time">01:30</strong>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">NYAWA</span>
+        <strong id="hud-lives" class="lives">♥ ♥ ♥</strong>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">SKOR</span>
+        <strong id="hud-score">0000</strong>
+      </div>
+    </section>
+
+    <section class="game-frame">
+      <div class="canvas-wrap">
+        <canvas id="game" width="960" height="600" aria-label="Area permainan Agen Rahasia"></canvas>
+
+        <div id="start-screen" class="screen-overlay">
+          <div class="intro-panel">
+            <div class="pixel-emblem">AG</div>
+            <p class="eyebrow">TOP SECRET // AGENT DIVISION</p>
+            <h1>SECRET<br><span>PROTOCOL</span></h1>
+            <p class="intro-text">
+              Infiltrasi markas, kumpulkan data rahasia, pecahkan
+              kode, dan pulihkan sistem keamanan.
+            </p>
+            <div class="briefing">
+              <div><span>01</span> Training Room</div>
+              <div><span>02</span> Encrypted Files</div>
+              <div><span>03</span> Final Operation</div>
+            </div>
+            <div class="home-actions">
+              <button id="briefing-btn" class="secondary-btn" type="button">▣ LIHAT MISSION BRIEFING</button>
+              <button id="start-btn" class="primary-btn">▶ MULAI MISI</button>
+            </div>
+            <p class="controls-note">
+              WASD / PANAH = BERGERAK &nbsp; • &nbsp; E = INTERAKSI
+            </p>
+          </div>
+        </div>
+
+        <div id="briefing-screen" class="screen-overlay hidden">
+          <div class="intro-panel briefing-panel">
+            <p class="eyebrow">TOP SECRET // MISSION INTELLIGENCE</p>
+            <h2>MISSION BRIEFING</h2>
+            <p class="intro-text">Pelajari informasi operasi sebelum memulai. Pilih salah satu misi untuk melihat detailnya.</p>
+            <div class="mission-tabs" role="group" aria-label="Pilih misi">
+              <button class="mission-tab active" data-mission="0" type="button">01 <span>TRAINING</span></button>
+              <button class="mission-tab" data-mission="1" type="button">02 <span>ENCRYPTED</span></button>
+              <button class="mission-tab" data-mission="2" type="button">03 <span>FINAL OPS</span></button>
+            </div>
+            <div class="mission-brief-card" aria-live="polite">
+              <div class="brief-card-top"><span id="brief-number">OPERATION 01</span><span id="brief-duration">90 SECONDS</span></div>
+              <h3 id="brief-title">TRAINING ROOM</h3>
+              <p class="brief-topic">TARGET KNOWLEDGE: <strong id="brief-topic">NILAI FUNGSI</strong></p>
+              <p id="brief-story" class="brief-story"></p>
+              <div class="brief-objective"><strong>OBJECTIVES</strong><ul id="brief-objectives"><li>Selesaikan 3 terminal data.</li><li>Ambil kartu akses.</li><li>Temukan pintu keluar.</li></ul></div>
+            </div>
+            <div class="briefing-actions">
+              <button id="brief-back" class="secondary-btn" type="button">← HOMEPAGE</button>
+              <button id="brief-prev" class="secondary-btn" type="button">← SEBELUMNYA</button>
+              <button id="brief-next" class="secondary-btn" type="button">SELANJUTNYA →</button>
+              <button id="brief-start" class="primary-btn" type="button">▶ MULAI OPERASI</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="pause-screen" class="screen-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+          <div class="intro-panel pause-panel">
+            <div class="pixel-emblem">Ⅱ</div>
+            <p class="eyebrow">AGENT PROTOCOL // SESSION PAUSED</p>
+            <h2 id="pause-title">GAME PAUSED</h2>
+            <p class="intro-text">Operasi sedang dijeda. Waktu, penjaga, dan pergerakan berhenti sementara.</p>
+            <div class="home-actions">
+              <button id="resume-btn" class="primary-btn" type="button">▶ LANJUTKAN MISI</button>
+              <button id="pause-home-btn" class="secondary-btn" type="button">⌂ KEMBALI KE HOMEPAGE</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="question-modal" class="modal hidden">
+          <div class="terminal-panel">
+            <div class="terminal-header">
+              <span>▣ SECURE TERMINAL</span>
+              <span id="terminal-index">DATA 01</span>
+            </div>
+            <p class="eyebrow">ENCRYPTION CHALLENGE</p>
+            <h2 id="question-title">Dekripsi data</h2>
+            <p id="question-text" class="question-text"></p>
+            <p id="question-hint" class="question-hint">
+              Masukkan jawaban angka atau ekspresi yang benar.
+            </p>
+            <form id="answer-form">
+              <label for="answer-input">INPUT KODE</label>
+              <input id="answer-input" type="text" inputmode="decimal" autocomplete="off" placeholder="Ketik jawaban..." required>
+              <p id="answer-feedback" class="answer-feedback" aria-live="polite"></p>
+              <div class="modal-actions">
+                <button type="submit" class="primary-btn">VERIFIKASI KODE</button>
+                <button id="close-terminal" type="button" class="secondary-btn">KEMBALI</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="message-banner" class="message-banner hidden" role="status"></div>
+
+        <div id="end-screen" class="screen-overlay hidden">
+          <div class="intro-panel result-panel">
+            <div id="end-icon" class="pixel-emblem">✓</div>
+            <p id="end-eyebrow" class="eyebrow">MISSION COMPLETE</p>
+            <h1 id="end-title">MISI BERHASIL</h1>
+            <p id="end-description" class="intro-text"></p>
+            <div class="result-box">
+              <span>SKOR AKHIR</span>
+              <strong id="end-score">0000</strong>
+              <span>PERINGKAT AGEN</span>
+              <h2 id="end-rank">ELITE AGENT</h2>
+            </div>
+            <div class="result-actions">
+              <button id="restart-btn" class="primary-btn">↻ ULANGI MISI</button>
+              <button id="end-home-btn" class="secondary-btn" type="button">⌂ KEMBALI KE HOMEPAGE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-footer">
+        <span id="objective">OBJEKTIF: TEMUKAN TERMINAL DATA</span>
+        <span id="key-status">KARTU AKSES: BELUM DIDAPAT</span>
+      </div>
+    </section>
+
+    <section class="bottom-layout">
+      <div class="info-panel">
+        <h2>MISSION INTEL</h2>
+        <p id="mission-description">
+          Jelajahi ruangan dan temukan terminal bercahaya.
+          Dekati terminal, lalu tekan E untuk berinteraksi.
+        </p>
+        <div class="legend">
+          <span><i class="legend-agent"></i> Agen</span>
+          <span><i class="legend-terminal"></i> Terminal</span>
+          <span><i class="legend-key"></i> Kartu akses</span>
+          <span><i class="legend-guard"></i> Penjaga</span>
+        </div>
+      </div>
+      <div class="control-panel">
+        <h2>KONTROL</h2>
+        <div class="control-content">
+          <div class="keyboard-hint">
+            <div class="key-row"><kbd>W</kbd></div>
+            <div class="key-row">
+              <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+            </div>
+            <small>ATAU TOMBOL PANAH</small>
+          </div>
+          <div class="action-hint">
+            <kbd>E</kbd>
+            <span>INTERAKSI</span>
+            <small>Terminal / Pintu</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mobile-controls" aria-label="Kontrol sentuh">
+      <div class="dpad">
+        <button class="direction-btn up" data-dir="up" aria-label="Bergerak ke atas">▲</button>
+        <button class="direction-btn left" data-dir="left" aria-label="Bergerak ke kiri">◀</button>
+        <button class="direction-btn down" data-dir="down" aria-label="Bergerak ke bawah">▼</button>
+        <button class="direction-btn right" data-dir="right" aria-label="Bergerak ke kanan">▶</button>
+      </div>
+      <button id="interact-btn" class="interact-btn">E<br><small>AKSI</small></button>
+    </section>
+
+    <footer class="page-footer">
+      AGENT PROTOCOL © 2026 — EDUCATIONAL GAME PROJECT
+    </footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
